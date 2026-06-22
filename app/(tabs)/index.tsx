@@ -1,9 +1,21 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import React, { useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
 export default function App() {
-  const [task, setTask] = useState<string>("");
+  const [task, setTask] = useState('');
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    console.log('Component mounted!');
+  }, []);
+
+  function handleAddTask() {
+    if (task.trim() === '') return;
+    setTasks([...tasks, { id: Date.now().toString(), title: task, completed: false }]);
+    setTask('');
+  }
+
   return (
     <View style={styles.container}>
       <View style={headerStyles.header}>
@@ -11,26 +23,33 @@ export default function App() {
       </View>
 
       <View style={styles.inputRow}>
-        <TextInput style={styles.input} placeholder="Enter Task"value={task} onChangeText={setTask} />
-        <TouchableOpacity style={styles.addButton}>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Task"
+          value={task}
+          onChangeText={setTask}
+        />
+        <TouchableOpacity style={styles.addButton} onPress={handleAddTask}>
           <MaterialIcons name="add" size={22} color="#fff" />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.taskRow}>
-        <MaterialIcons name="check-box-outline-blank" size={20} color="#5A6472" />
-        <Text style={styles.taskText}>Study React Native</Text>
+      {tasks.map((item) => (
+        <View key={item.id} style={styles.taskRow}>
+          <MaterialIcons
+            name={item.completed ? 'check-box' : 'check-box-outline-blank'}
+            size={20}
+            color={item.completed ? '#5A6472' : '#5A6472'}
+          />
+          <Text style={styles.taskText}>{item.title}</Text>
+        </View>
+      ))}
     </View>
-    <View style={styles.taskRow}>
-        <MaterialIcons name="check-box-outline-blank" size={20} color="#5A6472" />
-        <Text style={styles.taskText}>Finish Assignment</Text>
-    </View>
-  </View>
   );
 }
 
-// headerStyles is kept separate from the rest of the screen&#39;s styles —
-// the header is a distinct visual region (title bar) that&#39;s a natural
+// headerStyles is kept separate from the rest of the screen's styles -
+// the header is a distinct visual region (title bar) that's a natural
 // candidate to later become its own component or shared layout.
 const headerStyles = StyleSheet.create({
   header: {
@@ -47,12 +66,12 @@ const headerStyles = StyleSheet.create({
   },
 });
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      paddingHorizontal: 20,
-      backgroundColor: '#fff',
-    },
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+    backgroundColor: '#fff',
+  },
   inputRow: {
     flexDirection: 'row',
     marginBottom: 20,
@@ -82,5 +101,5 @@ const headerStyles = StyleSheet.create({
   },
   taskText: {
     fontSize: 15,
-    },
-  });
+  },
+});
